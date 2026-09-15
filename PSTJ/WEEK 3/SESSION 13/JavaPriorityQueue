@@ -1,0 +1,102 @@
+#PROGRAM
+import java.util.*;
+
+class Student {
+    private int id;
+    private String name;
+    private double cgpa;
+
+    public Student(int id, String name, double cgpa) {
+        this.id = id;
+        this.name = name;
+        this.cgpa = cgpa;
+    }
+
+    public int getID() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getCGPA() {
+        return cgpa;
+    }
+}
+
+class Priorities {
+    public List<Student> getStudents(List<String> events) {
+
+        PriorityQueue<Student> pq = new PriorityQueue<Student>(
+            new Comparator<Student>() {
+                public int compare(Student a, Student b) {
+
+                    // Higher CGPA first
+                    if (a.getCGPA() < b.getCGPA())
+                        return 1;
+
+                    if (a.getCGPA() > b.getCGPA())
+                        return -1;
+
+                    // Same CGPA -> name alphabetically
+                    int nameCompare =
+                        a.getName().compareTo(b.getName());
+
+                    if (nameCompare != 0)
+                        return nameCompare;
+
+                    // Same name -> lower ID first
+                    return a.getID() - b.getID();
+                }
+            }
+        );
+
+        for (String event : events) {
+
+            String[] parts = event.split(" ");
+
+            if (parts[0].equals("ENTER")) {
+
+                String name = parts[1];
+                double cgpa = Double.parseDouble(parts[2]);
+                int id = Integer.parseInt(parts[3]);
+
+                pq.add(new Student(id, name, cgpa));
+
+            } else if (parts[0].equals("SERVED")) {
+
+                if (!pq.isEmpty()) {
+                    pq.poll();
+                }
+            }
+        }
+
+        List<Student> result = new ArrayList<Student>();
+
+        while (!pq.isEmpty()) {
+            result.add(pq.poll());
+        }
+
+        return result;
+    }
+}
+#INPUT
+12
+ENTER John 3.75 50
+ENTER Mark 3.8 24
+ENTER Shafaet 3.7 35
+SERVED
+SERVED
+ENTER Samiha 3.85 36
+SERVED
+ENTER Ashley 3.9 42
+ENTER Maria 3.6 46
+ENTER Anik 3.95 49
+ENTER Dan 3.95 50
+SERVED
+#OUTPUT
+Dan
+Ashley
+Shafaet
+Maria
